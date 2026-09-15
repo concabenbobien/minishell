@@ -26,5 +26,7 @@ typedef struct
     size_t capacity;
     size_t count;
 } TokenStream;
-
+void token_stream_init(TokenStream *stream);
+int token_stream_push(TokenStream *stream, Token token);
+void token_stream_destroy(TokenStream *stream);
 #endif
