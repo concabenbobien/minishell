@@ -4,9 +4,9 @@
 #include <stddef.h>
 typedef enum {
     TOK_WORD,
-    TOK_DIRECT_APPEND,
-    TOK_DIRECT_OUT,
-    TOK_DIRECT_IN,
+    TOK_REDIRECT_APPEND,
+    TOK_REDIRECT_OUT,
+    TOK_REDIRECT_IN,
     TOK_EOF
 } 
 TokenType;
