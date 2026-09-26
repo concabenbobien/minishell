@@ -1,37 +1,55 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include "lexer.h"
+#include "parser.h"
+#include "executor.h"
 #include "token.h"
 
 int main(void)
 {
-    char source[] = "echo hello > out";
+    char *line = NULL;
+    size_t capacity = 0;
 
-    TokenStream stream;
+    while (1) {
+        printf("minish$ ");
+        fflush(stdout);
 
-    if (scan(source, &stream) != 0) {
-        fprintf(stderr, "lexer failed\n");
-        return 1;
-    }
+        ssize_t read = getline(&line, &capacity, stdin);
 
-    for (size_t i = 0; i < stream.count; i++) {
-        Token token = stream.items[i];
-
-        printf(
-            "type=%d start=%zu length=%zu",
-            token.type,
-            token.start,
-            token.length
-        );
-
-        if (token.lexeme != NULL) {
-            printf(" lexeme=\"%s\"", token.lexeme);
+        if (read == -1) {
+            break;  /* EOF or input error */
         }
 
-        printf("\n");
+        /* Remove newline added when Enter was pressed. */
+        if (read > 0 && line[read - 1] == '\n') {
+            line[read - 1] = '\0';
+        }
+
+        TokenStream tokens;
+
+        if (scan(line, &tokens) != 0) {
+            fprintf(stderr, "lexer error\n");
+            continue;
+        }
+
+        SimpleCommand command;
+
+        if (parse_simple_command(&tokens, &command) != 0) {
+            fprintf(stderr, "parse error\n");
+            token_stream_destroy(&tokens);
+            continue;
+        }
+
+        if (execute_simple_command(&command) != 0) {
+            fprintf(stderr, "execution error\n");
+        }
+
+        simple_command_destroy(&command);
+        token_stream_destroy(&tokens);
     }
 
-    token_stream_destroy(&stream);
-
+    free(line);
     return 0;
 }

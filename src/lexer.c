@@ -1,6 +1,7 @@
 #include <stdlib.h>   
 #include <string.h>   
 #include "lexer.h"
+
 static int match_operator(
     const char *source,
     size_t pos,
@@ -17,7 +18,6 @@ static int match_operator(
         }
         return 1;
     }
-
     if (source[pos] == '<') {
         *type = TOK_REDIRECT_IN;
         *length = 1;
@@ -27,7 +27,7 @@ static int match_operator(
     return 0;
 }
 
-static int scan(const char *source, TokenStream *stream)
+ int scan(const char *source, TokenStream *stream)
 {
     token_stream_init(stream);
 
